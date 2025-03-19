@@ -8,31 +8,42 @@
 <body>
     <h2>Sube una Imagen</h2>
     <input type="file" id="fileInput">
-    <button onclick="subirArchivo()">Subir</button>
+    <button id="uploadBtn">Subir</button>
     <h3>Imágenes Subidas:</h3>
-    <div id="imagenes"></div>
+    <div id="uploadedImages"></div>
 
     <script>
-        async function subirArchivo() {
-            const file = document.getElementById("fileInput").files[0];
-            if (!file) return alert("Selecciona un archivo");
+    document.getElementById('uploadBtn').addEventListener('click', async () => {
+        const fileInput = document.getElementById('fileInput');
 
-            const formData = new FormData();
-            formData.append("image", file);
+        if (!fileInput.files.length) {
+            alert('Selecciona una imagen primero.');
+            return;
+        }
 
-            const res = await fetch("https://subir-imagenes.vercel.app/upload", { // Reemplaza con tu URL de Vercel
-                method: "POST",
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+
+        try {
+            const response = await fetch('/api/upload', { // Asegúrate de que la API esté en esta ruta
+                method: 'POST',
                 body: formData
             });
 
-            const data = await res.json();
-            if (data.url) {
-                const img = document.createElement("img");
-                img.src = data.url;
-                img.width = 200;
-                document.getElementById("imagenes").appendChild(img);
+            const data = await response.json();
+
+            if (response.ok) {
+                document.getElementById('uploadedImages').innerHTML += 
+                    `<img src="${data.url}" width="200" alt="Imagen subida"/>`;
+            } else {
+                alert(`Error: ${data.error || 'No se pudo subir la imagen'}`);
             }
+        } catch (error) {
+            alert('Error al conectar con el servidor.');
+            console.error('Error:', error);
         }
-    </script>
+    });
+</script>
+
 </body>
 </html>

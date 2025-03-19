@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir Imágenes</title>
+</head>
+<body>
+    <h2>Sube una Imagen</h2>
+    <input type="file" id="fileInput">
+    <button onclick="subirArchivo()">Subir</button>
+    <h3>Imágenes Subidas:</h3>
+    <div id="imagenes"></div>
+
+    <script>
+        async function subirArchivo() {
+            const file = document.getElementById("fileInput").files[0];
+            if (!file) return alert("Selecciona un archivo");
+
+            const formData = new FormData();
+            formData.append("image", file);
+
+            const res = await fetch("https://subir-imagenes.vercel.app/upload", { // Reemplaza con tu URL de Vercel
+                method: "POST",
+                body: formData
+            });
+
+            const data = await res.json();
+            if (data.url) {
+                const img = document.createElement("img");
+                img.src = data.url;
+                img.width = 200;
+                document.getElementById("imagenes").appendChild(img);
+            }
+        }
+    </script>
+</body>
+</html>
